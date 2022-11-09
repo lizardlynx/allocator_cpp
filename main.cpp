@@ -10,9 +10,9 @@ using namespace std;
 
 int main()
 {
-    // manualCall();
+    manualCall();
 
     // tester
-    Tester t;
-    t.test();
+    // Tester t;
+    // t.test();
 }
