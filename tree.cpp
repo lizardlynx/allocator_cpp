@@ -159,19 +159,19 @@ void RedBlackTree::deleteNodeHelper(NodePtr node, size_t key, block* ptr) {
         }
     }
 
-    // if (node == TNULL)
-    //     node = nodeTemp;
+    if (node == TNULL)
+        node = nodeTemp;
 
-    // while (node != TNULL) {
-    //     if (node->data == key && (!ptr || (ptr && node->b == ptr)))
-    //         z = node;
+    while (node != TNULL) {
+        if (node->data == key && (!ptr || (ptr && node->b == ptr)))
+            z = node;
 
-    //     if (node->data < key) {
-    //     node = node->right;
-    //     } else {
-    //     node = node->left;
-    //     }
-    // }
+        if (node->data < key) {
+        node = node->right;
+        } else {
+        node = node->left;
+        }
+    }
 
     if (z == TNULL) {
         cout << "Key not found in the tree" << endl;

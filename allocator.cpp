@@ -33,7 +33,7 @@ Allocator::Allocator(size_t var_int, std::string var_name)
     released = false;
     if (var_name == "arena_size")
     {
-        if((PAGE_TYPE_OS == 0 && var_int > 1) || // one byte or delete row
+        if((PAGE_TYPE_OS == 0 && var_int > 1) ||
           PAGE_TYPE_OS == 1)
             A_SIZE = var_int;
     }
@@ -56,14 +56,11 @@ Allocator::Allocator(size_t var_int, std::string var_name)
 
 void Allocator::blockSplitHelper(Block block1, size_t size)
 {
-    cout << "block split hrlper" << endl;
     size_t block_size = block1.getCurrSize();
     block* block2_ptr = block1.block_split(size);    
     if (block2_ptr)
     {
-        cout << "%%%%%%%% %%%%%%%%%%" << endl;
         block* nnn = tree.findCorrectBlock(block_size);
-        // mem_show_tree();
         tree.deleteNode(block_size, block1.getPtr());
         tree.insert(size, block1.getPtr());
         Block block2 = block2_ptr;
@@ -71,12 +68,6 @@ void Allocator::blockSplitHelper(Block block1, size_t size)
         size_t size2 = block2.getCurrSize();
         tree.insert(size2, block2_ptr);
     }
-    cout << "end split helper" << endl;
-}
-
-void calcPageStart(size_t size) {
-
-
 }
 
 void* Allocator::blockMergeHelper(Block block1)
@@ -131,9 +122,13 @@ void *Allocator::mem_alloc(size_t size)
     {
         arena = Block(size, "arena_size");
         released = false;
+        size_t size = arena.getCurrSize();
+        block* arena_ptr = arena.getPtr();
+        tree.insert(size, arena_ptr);
+        return arena.block_to_payload();
     }
 
-    //call function for serching for correct block size
+    //call function for searching for correct block size
     block* block_ptr = tree.findCorrectBlock(size);
     if (block_ptr)
     {
@@ -178,7 +173,6 @@ void* Allocator::mem_realloc(void *ptr, size_t size)
     size_t n_c_size = next.getCurrSize();
     size_t n_size = n_c_size + currSize + BLOCK_STRUCT_SIZE;
     bool n_busy = next.isBusy();
-    cout << "--------size " << size << " currSize " << currSize << " block_size " << BLOCK_STRUCT_SIZE << endl;
     if (ptrBl == NULL)
     {
         return NULL;
@@ -186,20 +180,13 @@ void* Allocator::mem_realloc(void *ptr, size_t size)
     if (currSize < size && !n_busy && n_size >= size)
     {
         blockSplitHelper(next, (size - currSize)); 
-        // tree.deleteNode((size - currSize));
         block.setMergeOnlyNext(true);
         resultPtr = blockMergeHelper(block);
         block.setMergeOnlyNext(false);
         block.setBusy(1);
-        // Block block2 = block.block_next();
-        // blockMergeHelper(block2);
-        
     }
     else if (size + BLOCK_STRUCT_SIZE < currSize)
-    {
-        cout << "^^^^^^^^^^^^^^^^" << endl;
-        blockSplitHelper(block, size);
-    } 
+        blockSplitHelper(block, size); 
     else 
     {
         resultPtr = mem_alloc(size);
@@ -221,13 +208,11 @@ void Allocator::mem_show()
 
     for (Block block = arena;; block = block.block_next()) 
     {
-        // if (block.getCurrSize() == 0) continue;
         printf("%s %10zu %10zu %10zu%s%s\n",
             block.isBusy() ? "busy" : "free",
             block.getCurrSize(), block.getPrevSize(), block.getOffset(),
             block.isFirst() ? " first" : "",
             block.isLast() ? " last" : "");
-        if (block.isFirst() && block.isLast()) exit(1);
         if (block.isLast())
             break;
     }
@@ -247,6 +232,7 @@ void Allocator::mem_show_tree()
 
 void Allocator::return_memory()
 {
+    cout << "return memory" << endl;
     released = true;
     arena.return_memory();
 } 

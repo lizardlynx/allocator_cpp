@@ -42,7 +42,7 @@ Block::Block(size_t var_int, std::string var_name)
 {
     if (var_name == "arena_size")
     {
-        if((PAGE_TYPE_OS == 0 && var_int > 1) || // one byte or delete row
+        if((PAGE_TYPE_OS == 0 && var_int > 1) ||
           PAGE_TYPE_OS == 1)
             arenaSize = var_int;
     }
@@ -69,7 +69,6 @@ Block::Block(block* block, bool ifnew)
     }
     else
         block = b;
-    // cout << "create block" << endl;
 }
 
 std::vector<block*> Block::block_merge_helper(Block bl)
@@ -108,11 +107,8 @@ std::vector<block*> Block::block_merge()
         
     }
 
-    cout << "merge i before " << merge_i << endl;
     if (merge_only_next == false && merge_i == false && !isFirst())
     {
-        cout << "write to merged block pointers 0 " << c_size << endl;
-        cout << "merge i " << merge_i << endl;
         Block prev = block_prev();
         std::vector<block*> pointers = block_merge_helper(prev);
         merged_blocks_pointers[0] = pointers[1];
@@ -142,7 +138,6 @@ block* Block::block_split(size_t size)
     if (size_curr >= size + BLOCK_STRUCT_SIZE) 
     {
         size_curr -= size + BLOCK_STRUCT_SIZE;
-        // setBusy(1);
 
         if (size_curr > 0)
         {
@@ -164,8 +159,7 @@ block* Block::block_split(size_t size)
                 block3.setPrevSize(size_curr);
             }
         }
-    } 
-    // else cout << "Not enough Memory!" << endl;
+    }
     return block2_struct;
 }
 
